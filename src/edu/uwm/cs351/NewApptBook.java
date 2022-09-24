@@ -1,6 +1,7 @@
 package edu.uwm.cs351;
 
 import java.util.AbstractCollection;
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -27,7 +28,17 @@ public class NewApptBook extends AbstractCollection<Appointment> implements Clon
 	private int version;
 	private Appointment[] data;
 	
+	//Constructor of NewApptBook
 	public NewApptBook() {
+		this.data = new Appointment[0];
+		version = 0;
+		manyItems = 0;
+	}
+	
+	//Constructor of NewApptBook with a given capacity
+	public NewApptBook(int capacity) {
+		this.data = new Appointment[capacity];
+		version = 0;
 		manyItems = 0;
 	}
 	
@@ -54,18 +65,103 @@ public class NewApptBook extends AbstractCollection<Appointment> implements Clon
 			}
 		}
 		
+		
 		return true;
 	}
 	
-	@Override //implementation
+	
+	@Override //required
 	public int size() {
-		return data.length;
+		return manyItems;
+	}
+
+	/**
+	 * Basically copied from my Homework 2 method for ensureCapacity.
+	 * Will probably optimize using Homework 2 solutions later one.
+	 * @param minimumCapacity
+	 */
+	
+	private void ensureCapacity(int minimumCapacity) {
+		if (minimumCapacity >= Integer.MAX_VALUE) {
+			throw new OutOfMemoryError();
+		}
+
+		//Copied from ApptBook Homework 2
+		if(data.length == 0) {
+			Appointment[] temp = new Appointment[minimumCapacity];
+			data = temp;
+		}
+		else if (minimumCapacity/data.length >= 1 && minimumCapacity/data.length <= 2) {
+			Appointment[] temp = new Appointment[2*data.length];
+			for (int i = 0; i < data.length; ++i) {
+				temp[i] = data[i];
+			}
+			data = temp;
+		}
+		else if (minimumCapacity/data.length > 2) {
+			Appointment[] temp = new Appointment[minimumCapacity];
+			for (int i = 0; i < data.length; ++i) {
+				temp[i] = data[i];
+			}
+			data = temp;
+		}
+		
+		if (data.length < minimumCapacity) {
+			Appointment[] temp = new Appointment[minimumCapacity];
+			for (int i = 0; i < data.length; ++i) {
+				temp[i] = data[i];
+			}
+		}
 	}
 	
-	@Override
+	/**
+	 * add methods is basically a really simple implementation of the
+	 * insert method given from Homework 2 solutions. Currently, does not
+	 * add elements in between the sequence, but will probably
+	 * add that later.
+	 */
+	
+	@Override //implementation
+	public boolean add(Appointment o) {
+		assert wellFormed();
+		
+		if (o == null) {
+			throw new NullPointerException();
+		}
+		
+		ensureCapacity(manyItems+1);
+		
+		if (manyItems == 0) {
+			data[0] = o;
+		}
+		else if (manyItems > 0) {		
+			int i;
+			for (i = manyItems; i > 0 && data[i-1].compareTo(o) > 0; --i) {
+				data[i] = data[i-1];
+			}
+			data[i] = o;
+		}
+
+		manyItems++;
+		version++;
+		
+		assert wellFormed();
+		
+		return true;
+		
+	}
+	
+	@Override //required
 	public Iterator<Appointment> iterator() {
 		// TODO Auto-generated method stub
-		return null;
+		MyIterator it = new MyIterator();
+		return it;
+	}
+	
+	public Iterator<Appointment> iterator(Appointment o) {
+		// TODO Auto-generated method stub
+		MyIterator it = new MyIterator(o);
+		return it;
 	}
 	
 	private class MyIterator implements Iterable<Appointment>, Iterator<Appointment> // TODO: what should this implement?	
@@ -95,37 +191,52 @@ public class NewApptBook extends AbstractCollection<Appointment> implements Clon
 			return false;
 		}
 
-		@Override //implementation
+		@Override //required
 		public boolean hasNext() {
-			//Returns true if this.current + 1 is less than many items, and false otherwise
-			return this.current + 1 < manyItems;
+			//Returns true if next is less than many items, and false otherwise
+			return next < manyItems;
 		}
 
-		@Override //implementation
+		@Override //required
 		public Appointment next() {
 			//Checks to see if there exists an element beyond
+			assert wellFormed();
+			
+			
 			if (!hasNext()) {
 				//and if it does not, equal next to manyItems and throws exception
-				this.next = manyItems;
 				throw new NoSuchElementException();
 			}
-			else {
-				//and if it does, adds 1 to current to advance it, will probably replace with advance() later if needed.
-				this.current++;
+			else if (version != myVersion) {
+				throw new ConcurrentModificationException();
 			}
-			//returns the element in the position after, hopefully.
+			else {
+				//and if it does, current = next and next++.
+				current = next;
+				next++;
+			}
+			
+			assert wellFormed();
+			
 			return data[this.current];
 		}
 
-		@Override //implementation
+		@Override //required
 		public Iterator<Appointment> iterator() {
-			//initial constructor, where there does not exist a current element yet until one is added
+			// TODO Auto-generated method stub
 			this.current = -1;
 			return this;
 		}
 		
-		public Iterator<Appointment> iterator(Appointment o) {
-			//implemeneted constructor where if given an Appointment object will look through the array
+		public MyIterator() {
+			//initial constructor, where there does not exist a current element yet until one is added
+			next = 0;
+			myVersion = version;
+			this.current = next;
+		}
+		
+		public MyIterator(Appointment o) {
+			//Implements constructor where if given an Appointment object will look through the array
 			//to find an object equal to the given, in this case o, and set current to that index.
 			//Might have to change to an enhanced for-loop at a later date.
 			if (o != null) {
@@ -139,8 +250,36 @@ public class NewApptBook extends AbstractCollection<Appointment> implements Clon
 				}
 			}
 			
-			return this;
 		}
+		
+		/**
+		 * The remove method current runs that if next is == 0, meaning that next()
+		 * not been called yet since next is never incremented, or current is less
+		 * than 0 if the remove method has already ran once and it sets current = -1
+		 * to represent there is no current element.
+		 */
+
+		public void remove() {
+			if (next == 0 || current < 0) {
+				throw new IllegalStateException();
+			}
+			else {
+				data[current] = null;
+				Appointment[] temp = new Appointment[manyItems-1];
+				int tempIndex = 0;
+				for (int i = 0; i < manyItems; ++i) {
+					if (data[i] != null) {
+						temp[tempIndex] = data[i];
+						tempIndex++;
+					}
+				}
+				current = -1;
+				data = temp;
+				manyItems--;
+			}
+				
+		}
+		
 		
 		
 	}
