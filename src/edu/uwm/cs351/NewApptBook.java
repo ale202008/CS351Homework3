@@ -88,6 +88,7 @@ public class NewApptBook extends AbstractCollection<Appointment> implements Clon
 
 		private static boolean doReport = true;
 		private boolean report(String error) {
+			//Prints out stuff
 			if (doReport) {
 				System.out.println("Invariant error: " + error);
 			}
@@ -96,29 +97,37 @@ public class NewApptBook extends AbstractCollection<Appointment> implements Clon
 
 		@Override //implementation
 		public boolean hasNext() {
+			//Returns true if this.current + 1 is less than many items, and false otherwise
 			return this.current + 1 < manyItems;
 		}
 
 		@Override //implementation
 		public Appointment next() {
+			//Checks to see if there exists an element beyond
 			if (!hasNext()) {
+				//and if it does not, equal next to manyItems and throws exception
 				this.next = manyItems;
 				throw new NoSuchElementException();
 			}
 			else {
+				//and if it does, adds 1 to current to advance it, will probably replace with advance() later if needed.
 				this.current++;
 			}
+			//returns the element in the position after, hopefully.
 			return data[this.current];
 		}
 
 		@Override //implementation
 		public Iterator<Appointment> iterator() {
+			//initial constructor, where there does not exist a current element yet until one is added
 			this.current = -1;
 			return this;
 		}
 		
 		public Iterator<Appointment> iterator(Appointment o) {
-			
+			//implemeneted constructor where if given an Appointment object will look through the array
+			//to find an object equal to the given, in this case o, and set current to that index.
+			//Might have to change to an enhanced for-loop at a later date.
 			if (o != null) {
 				for (Appointment element: this) {
 					for (int i = 0; i < manyItems; ++i) {
