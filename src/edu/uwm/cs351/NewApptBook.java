@@ -260,7 +260,13 @@ public class NewApptBook extends AbstractCollection<Appointment> implements Clon
 		 */
 
 		public void remove() {
-			if (next == 0 || current < 0) {
+			/**
+			 * Since we are removing the current element that means there will not exist
+			 * an element within the iterator if the collection has not changed. So the condition
+			 * is that after the remove method is called once, next = 0 and current = 0 like how
+			 * the fields were initialized in the constructors.
+			 */
+			if (next == 0 && current == 0) {
 				throw new IllegalStateException();
 			}
 			else {
@@ -273,7 +279,8 @@ public class NewApptBook extends AbstractCollection<Appointment> implements Clon
 						tempIndex++;
 					}
 				}
-				current = -1;
+				next = 0;
+				current = 0;
 				data = temp;
 				manyItems--;
 			}
