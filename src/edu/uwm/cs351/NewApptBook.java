@@ -243,7 +243,7 @@ public class NewApptBook extends AbstractCollection<Appointment> implements Clon
 		
 		if (size <= 0) {
 			if (first >= 1) {
-				return 1;
+				return first;
 			}
 			return 0;
 		}
@@ -277,10 +277,15 @@ public class NewApptBook extends AbstractCollection<Appointment> implements Clon
 		 * as suggested by the commentary on question @287 on Piazza. Did not look
 		 * at each other's code nor copy.
 		 */
+		
+
 		NewApptBook temp = new NewApptBook();
+		if (manyItems == 0) {
+			return;
+		}
 		data = temp.data;
-		version++;
 		manyItems = 0;
+		version++;
 	}
 		
 	
