@@ -37,6 +37,9 @@ public class NewApptBook extends AbstractCollection<Appointment> implements Clon
 	
 	//Constructor of NewApptBook with a given capacity
 	public NewApptBook(int capacity) {
+		if (capacity < 0) {
+			throw new IllegalArgumentException();
+		}
 		this.data = new Appointment[capacity];
 		version = 0;
 		manyItems = 0;
@@ -174,8 +177,36 @@ public class NewApptBook extends AbstractCollection<Appointment> implements Clon
 		return true;
 	}
 	
+	@Override //implementation
 	public NewApptBook clone() {
-		return this;
+		/**
+		 * Took the clone method from Homework 2 that was given to use
+		 * and it works pretty fine.
+		 */
+		
+		assert wellFormed();
+
+		NewApptBook answer;
+	
+		try
+		{
+			answer = (NewApptBook) super.clone( );
+		}
+		catch (CloneNotSupportedException e)
+		{  // This exception should not occur. But if it does, it would probably
+			// indicate a programming error that made super.clone unavailable.
+			// The most common error would be forgetting the "Implements Cloneable"
+			// clause at the start of this class.
+			throw new RuntimeException
+			("This class does not implement Cloneable");
+		}
+	
+		// all that is needed is to clone the data array.
+		// (Exercise: Why is this needed?)
+		answer.data = data.clone( );
+		
+		assert wellFormed();
+		return answer;
 	}
 	
 	@Override //required
@@ -190,18 +221,32 @@ public class NewApptBook extends AbstractCollection<Appointment> implements Clon
 		 * Reconstructed the constructor for iterator for the collection
 		 * and by the comments made in the PDF sends an index instead of the
 		 * object. Also added additional methods such as addAll.
+		 * 
+		 * The current method uses three different cases to do what it needs
+		 * to do.
 		 */
 		if (o == null) {
 			throw new NullPointerException();
 		}
 		// TODO Auto-generated method stub
+		
 		int tempIndex = 0;
 		for (int i = 0; i < manyItems; ++i) {
 			if (o.compareTo(data[i]) == 0) {
 				tempIndex = i;
+				break;
 			}
-			else tempIndex++;
+			else if (o.compareTo(data[i]) < 0) {
+				tempIndex = i;
+			}
+			else if (o.compareTo(data[i]) > 0) {
+				tempIndex++;
+			}
+
 		}
+		
+		
+		
 		MyIterator it = new MyIterator(tempIndex);
 		return it;
 	}
@@ -289,6 +334,7 @@ public class NewApptBook extends AbstractCollection<Appointment> implements Clon
 			//to find an object equal to the given, in this case o, and set current to that index.
 			//Might have to change to an enhanced for-loop at a later date.
 			next = Index;
+
 			this.current = next;
 			myVersion = version;
 
@@ -315,7 +361,7 @@ public class NewApptBook extends AbstractCollection<Appointment> implements Clon
 				throw new ConcurrentModificationException();
 			}
 			
-			if (next == 0 && current == 0) {
+			if (next == current) {
 				throw new IllegalStateException();
 			}
 			else {
