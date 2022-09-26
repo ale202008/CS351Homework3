@@ -232,15 +232,11 @@ public class NewApptBook extends AbstractCollection<Appointment> implements Clon
 		
 		int tempIndex = 0;
 		for (int i = 0; i < manyItems; ++i) {
-			if (o.compareTo(data[i]) == 0) {
-				tempIndex = i;
-				break;
-			}
-			else if (o.compareTo(data[i]) < 0) {
-				tempIndex = i;
-			}
-			else if (o.compareTo(data[i]) > 0) {
+			if (o.compareTo(data[i]) > 0) {
 				tempIndex++;
+			}
+			else {
+				break;
 			}
 
 		}
