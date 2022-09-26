@@ -231,20 +231,56 @@ public class NewApptBook extends AbstractCollection<Appointment> implements Clon
 		// TODO Auto-generated method stub
 		
 		int tempIndex = 0;
-		for (int i = 0; i < manyItems; ++i) {
-			if (o.compareTo(data[i]) > 0) {
-				tempIndex++;
-			}
-			else {
-				break;
-			}
-
-		}
 		
-		
+		tempIndex = this.search(data, 0, manyItems, o);
 		
 		MyIterator it = new MyIterator(tempIndex);
 		return it;
+	}
+	
+	public static int search(Appointment[] a, int first, int size, Appointment o) {
+		int mid;
+		
+		if (size <= 0) {
+			if (first >= 1) {
+				return 1;
+			}
+			return 0;
+		}
+		else {
+			mid = first + size/2;
+			if (o.compareTo(a[mid]) == 0) {
+				if (mid != 0) {
+					if (o.compareTo(a[mid-1]) == 0) {
+						return mid-1;
+					}
+				}
+				
+				return mid;
+			}
+			else if (o.compareTo(a[mid]) < 0) {
+				return search(a, first, size/2, o);
+			}
+			if (o.compareTo(a[mid]) > 0) {
+				return search(a, mid+1, (size-1)/2, o);
+			}
+		}
+		
+		return 0;
+		
+	}
+	
+	@Override //implementation
+	public void clear() {
+		/*
+		 * Collaborated with Max Dreher on ideas for overriding the clear method
+		 * as suggested by the commentary on question @287 on Piazza. Did not look
+		 * at each other's code nor copy.
+		 */
+		NewApptBook temp = new NewApptBook();
+		data = temp.data;
+		version++;
+		manyItems = 0;
 	}
 		
 	
