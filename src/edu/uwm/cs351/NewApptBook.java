@@ -374,8 +374,7 @@ public class NewApptBook extends AbstractCollection<Appointment> implements Clon
 						tempIndex++;
 					}
 				}
-				next = 0;
-				current = 0;
+				next--;
 				data = temp;
 				myVersion++;
 				version = myVersion;
