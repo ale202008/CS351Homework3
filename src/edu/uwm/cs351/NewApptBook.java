@@ -194,6 +194,8 @@ public class NewApptBook extends AbstractCollection<Appointment> implements Clon
 		@Override //required
 		public boolean hasNext() {
 			//Returns true if next is less than many items, and false otherwise
+			assert wellFormed();
+
 			return next < manyItems;
 		}
 
@@ -243,11 +245,13 @@ public class NewApptBook extends AbstractCollection<Appointment> implements Clon
 				for (Appointment element: this) {
 					for (int i = 0; i < manyItems; ++i) {
 						if (o.compareTo(element) == 0) {
-							this.current = i;
+							next = i;
 							break;
 						}
 					}
 				}
+			this.current = next;
+			myVersion = version;
 			}
 			
 		}
@@ -266,6 +270,9 @@ public class NewApptBook extends AbstractCollection<Appointment> implements Clon
 			 * is that after the remove method is called once, next = 0 and current = 0 like how
 			 * the fields were initialized in the constructors.
 			 */
+			
+			assert wellFormed();
+			
 			if (next == 0 && current == 0) {
 				throw new IllegalStateException();
 			}
@@ -284,6 +291,8 @@ public class NewApptBook extends AbstractCollection<Appointment> implements Clon
 				data = temp;
 				manyItems--;
 			}
+			
+			assert wellFormed();
 				
 		}
 		
