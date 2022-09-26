@@ -243,7 +243,7 @@ public class NewApptBook extends AbstractCollection<Appointment> implements Clon
 		
 		/*
 		 * Used the 11.1 section of the sample code as a base and modified as needed for
-		 * the binary search for the array. Random test also succeeds.
+		 * the binary search for the array. Random test also passes.
 		 */
 		
 		if (size <= 0) {

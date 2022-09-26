@@ -14,8 +14,8 @@ public class ApptBookIO {
 		return new Appointment(new Period(new Time(start),len),topic);
 	}
 	
-	private static void insert(ApptBook book, Calendar start, Duration len, String topic) {
-		book.insert(a(start,len,topic));
+	private static void insert(NewApptBook book, Calendar start, Duration len, String topic) {
+		book.add(a(start,len,topic));
 	}
 	
 	/**
@@ -24,7 +24,7 @@ public class ApptBookIO {
 	 * @param book book to read elements into
 	 * @exception IOException if there is a problem reading
 	 */
-	public static void read(ApptBook book) {
+	public static void read(NewApptBook book) {
 		Time now = new Time();
 		Calendar cal = now.asCalendar();
 		cal.setTimeZone(TimeZone.getDefault());
@@ -72,7 +72,7 @@ public class ApptBookIO {
 	 * @param book appointment to write
 	 * @exception IOException if there is a problem with writing
 	 */
-	public static void write(ApptBook book) throws IOException {
+	public static void write(NewApptBook book) throws IOException {
 		//XXX Do nothing
 		throw new IOException("write is not implemented");
 	}

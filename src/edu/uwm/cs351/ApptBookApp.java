@@ -8,7 +8,7 @@ public class ApptBookApp {
 	public static void main(String args[]) {
 		// A simple main program that finds conflicts 
 		// in an appointment book
-		ApptBook book = new ApptBook();
+		NewApptBook book = new NewApptBook();
 		ApptBookIO.read(book);
 		
 		// Print out all conflicts between neighboring appts today
@@ -23,10 +23,10 @@ public class ApptBookApp {
 		Appointment firstPossible = new Appointment(new Period(startOfDay,Duration.MILLISECOND),"");
 		
 		Appointment prev = null;
-		book.setCurrent(firstPossible);
+		book.iterator(firstPossible);
 		int conflictsFound = 0;
-		while (book.isCurrent()) {
-			Appointment next = book.getCurrent();
+		while (book.iterator().hasNext()) {
+			Appointment next = book.iterator().next();
 			if (next.getTime().getStart().difference(startOfDay).compareTo(Duration.DAY) >= 0) break;
 			if (prev != null) {
 				if (prev.getTime().overlap(next.getTime())) {
@@ -37,7 +37,7 @@ public class ApptBookApp {
 				}
 			}
 			prev = next;
-			book.advance();
+			book.iterator().next();
 		}
 		System.out.println("Conflicts found: " + conflictsFound);
 	}
