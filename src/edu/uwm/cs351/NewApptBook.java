@@ -241,6 +241,11 @@ public class NewApptBook extends AbstractCollection<Appointment> implements Clon
 	public static int search(Appointment[] a, int first, int size, Appointment o) {
 		int mid;
 		
+		/*
+		 * Used the 11.1 section of the sample code as a base and modified as needed for
+		 * the binary search for the array.
+		 */
+		
 		if (size <= 0) {
 			if (first >= 1) {
 				return first;
@@ -249,10 +254,18 @@ public class NewApptBook extends AbstractCollection<Appointment> implements Clon
 		}
 		else {
 			mid = first + size/2;
-			if (o.compareTo(a[mid]) == 0) {
+			if (o.compareTo(a[mid]) == 0) {		
 				if (mid != 0) {
-					if (o.compareTo(a[mid-1]) == 0) {
-						return mid-1;
+					while (a[mid-1] != null) {
+						if (o.compareTo(a[mid-1]) == 0) {
+							mid = mid-1;
+						}
+						else
+							break;
+						
+						if (mid == 0) {
+							break;
+						}
 					}
 				}
 				
