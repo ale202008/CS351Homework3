@@ -151,6 +151,33 @@ public class NewApptBook extends AbstractCollection<Appointment> implements Clon
 		
 	}
 	
+	public boolean addAll(NewApptBook collection) {
+		/**
+		 * Used homework 2 solution of insertAll and implemented it
+		 * for the addAll method.
+		 */
+		if (collection.manyItems == 0) {
+			return false;
+		}
+		
+		ensureCapacity(manyItems + collection.manyItems);
+		
+		if (collection == this) {
+			collection = collection.clone();
+		}
+		
+		for (int i = 0; i < collection.manyItems; ++i) {
+			this.add(collection.data[i]);
+		}
+		
+		
+		return true;
+	}
+	
+	public NewApptBook clone() {
+		return this;
+	}
+	
 	@Override //required
 	public Iterator<Appointment> iterator() {
 		// TODO Auto-generated method stub
@@ -159,10 +186,26 @@ public class NewApptBook extends AbstractCollection<Appointment> implements Clon
 	}
 	
 	public Iterator<Appointment> iterator(Appointment o) {
+		/**
+		 * Reconstructed the constructor for iterator for the collection
+		 * and by the comments made in the PDF sends an index instead of the
+		 * object. Also added additional methods such as addAll.
+		 */
+		if (o == null) {
+			throw new NullPointerException();
+		}
 		// TODO Auto-generated method stub
-		MyIterator it = new MyIterator(o);
+		int tempIndex = 0;
+		for (int i = 0; i < manyItems; ++i) {
+			if (o.compareTo(data[i]) == 0) {
+				tempIndex = i;
+			}
+			else tempIndex++;
+		}
+		MyIterator it = new MyIterator(tempIndex);
 		return it;
 	}
+		
 	
 	private class MyIterator implements Iterable<Appointment>, Iterator<Appointment> // TODO: what should this implement?	
 	{
@@ -195,6 +238,10 @@ public class NewApptBook extends AbstractCollection<Appointment> implements Clon
 		public boolean hasNext() {
 			//Returns true if next is less than many items, and false otherwise
 			assert wellFormed();
+			
+			if (version != myVersion) {
+				throw new ConcurrentModificationException();
+			}
 
 			return next < manyItems;
 		}
@@ -237,23 +284,14 @@ public class NewApptBook extends AbstractCollection<Appointment> implements Clon
 			this.current = next;
 		}
 		
-		public MyIterator(Appointment o) {
+		public MyIterator(int Index) {
 			//Implements constructor where if given an Appointment object will look through the array
 			//to find an object equal to the given, in this case o, and set current to that index.
 			//Might have to change to an enhanced for-loop at a later date.
-			if (o != null) {
-				for (Appointment element: this) {
-					for (int i = 0; i < manyItems; ++i) {
-						if (o.compareTo(element) == 0) {
-							next = i;
-							break;
-						}
-					}
-				}
+			next = Index;
 			this.current = next;
 			myVersion = version;
-			}
-			
+
 		}
 		
 		/**
@@ -273,6 +311,10 @@ public class NewApptBook extends AbstractCollection<Appointment> implements Clon
 			
 			assert wellFormed();
 			
+			if (version != myVersion) {
+				throw new ConcurrentModificationException();
+			}
+			
 			if (next == 0 && current == 0) {
 				throw new IllegalStateException();
 			}
@@ -289,6 +331,8 @@ public class NewApptBook extends AbstractCollection<Appointment> implements Clon
 				next = 0;
 				current = 0;
 				data = temp;
+				myVersion++;
+				version = myVersion;
 				manyItems--;
 			}
 			
